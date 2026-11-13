@@ -5,7 +5,7 @@
 | Họ và Tên | Mã Học Viên | Việc đã làm |
 |---|---|---|
 | Nguyễn Tấn Châu | 2A202603846 | Phân tích lát cắt & phạm vi (§1), thiết kế UX khi AI sai & ánh xạ HAX/PAIR (§3), demo ca lạ |
-| Nguyễn Phan Tấn Đức | 2A202603818 | Xây dựng bảng 10 kịch bản rủi ro & phân tích 2 ca đắt nhất (§2), chốt tiêu chí đánh giá (§6) |
+| Nguyễn Phan Tuấn Đức | 2A202603818 | Xây dựng bảng 10 kịch bản rủi ro & phân tích 2 ca đắt nhất (§2), chốt tiêu chí đánh giá (§6) |
 | Huỳnh Văn Cường | 2A202603866 | Thiết kế mức tự chủ 5 tool theo cost-of-error (§4), dựng prototype HTML & chụp ảnh đánh số (§5) |
 
 ---
@@ -49,5 +49,58 @@
   1. **Kịch bản #3 (Dấu hiệu cấp cứu tim mạch lẫn trong câu hỏi mua thuốc giảm đau):** Đắt nhất vì rủi ro **tử vong hoặc biến chứng tim mạch cấp tính tính bằng phút**. Nếu AI gợi ý thuốc giảm đau (`goi_y_san_pham`) hoặc đẩy khách vào hàng chờ dược sĩ online (`chuyen_duoc_si`), bệnh nhân mất thời gian vàng đi cấp cứu. Hậu quả hoàn toàn không thể đảo ngược.
   2. **Kịch bản #1 (Trẻ nhỏ sốt cao 39°C + định uống lại thuốc ho của bố):** Đắt thứ hai vì hội tụ cùng lúc **2 lỗi chí mạng**: (a) dùng thuốc người lớn cho trẻ em gây ngộ độc hoạt chất/quá liều, và (b) dữ liệu người dùng thiếu trầm trọng (không rõ tháng tuổi/cân nặng của bé) trong bối cảnh nửa đêm phụ huynh đang hoảng loạn, dễ làm theo lời AI ngay lập tức. Tổn thương gan/thần kinh ở trẻ nhỏ là không thể đảo ngược.
 * **Kịch bản suýt được chọn và lý do loại:** **Kịch bản #2 (Bà bầu 3 tháng hỏi thuốc cảm)** rất nguy hiểm vì thuốc cảm sai có thể gây dị tật thai nhi. Nhóm loại khỏi Top 2 vì: (1) khách đã tự khai báo rõ trạng thái *"bầu 3 tháng"* ngay trong câu đầu tiên nên AI dễ bắt từ khóa để chặn hơn so với ca #1 (khách không khai tuổi con và định lấy thuốc có sẵn ở nhà uống ngay), và (2) tốc độ gây hại của ca #2 tính theo ngày/tuần, không cấp bách từng phút đe dọa tính mạng ngay lập tức như ca cấp cứu tim mạch ở ca #3.
+
+---
+
+## §3. Khi AI sai (chặng 3)
+
+### 3.1. Kịch bản đắt #1: Dấu hiệu cấp cứu tim mạch lẫn trong câu hỏi mua thuốc giảm đau
+* **AI nói gì (nguyên văn):**
+  > *"CẢNH BÁO Y TẾ KHẨN CẤP: Triệu chứng đau tức ngực trái kèm khó thở ở người 70 tuổi là dấu hiệu nguy hiểm cần được bác sĩ cấp cứu kiểm tra ngay lập tức. Trợ lý AI không được phép gợi ý hay bán thuốc giảm đau trong trường hợp này vì có thể che lấp triệu chứng nguy hiểm. Bạn vui lòng gọi ngay Cấp cứu 115 hoặc đưa bác đến cơ sở y tế gần nhất."*
+* **Người dùng thấy gì:**
+  * Khung cảnh báo đỏ nổi bật kèm nút bấm **`Gọi Cấp cứu 115 ngay`**, nút **`Tìm bệnh viện cấp cứu gần nhất`**, và nút **`Nói chuyện Dược sĩ trực (Ưu tiên Đỏ · 0s chờ)`**.
+  * Nhãn trạng thái: **`Dừng tư vấn thuốc · Bỏ qua hàng chờ`**.
+  * Khung bằng chứng **`Dựa vào:`** *"Từ khóa nguy hiểm 'đau tức ngực trái' + 'khó thở' ở người cao tuổi (70 tuổi) · Quy chuẩn an toàn Pharmacity: Cấm gợi ý thuốc khi có dấu hiệu cấp cứu."*
+  * Thanh trạng thái bị vô hiệu hóa: **`Đã khóa tính năng gợi ý & đặt mua thuốc`**.
+* **Bước người dùng làm tiếp & Nếu không làm gì thì sao:**
+  * Người dùng bấm gọi 115, mở bản đồ bệnh viện hoặc kết nối trực tiếp Dược sĩ ưu tiên. Nếu không bấm gì sau 60 giây, Dược sĩ trực tự động nhắn/gọi kiểm tra tình hình từ ticket báo động đỏ.
+* **Ai được báo, sau bao lâu:**
+  * **Dược sĩ trực ca** được báo **ngay lập tức (0 giây)** qua thẻ Báo động Đỏ trên màn hình làm việc kèm tóm tắt triệu chứng và thông báo AI đã khóa bán thuốc.
+* **Quyết định phản ứng:**
+  * *Đã cân nhắc:* (A) Hỏi lại thêm câu sàng lọc tiền sử bệnh tim; (B) Gợi ý tạm thuốc giảm đau nhẹ kèm lời khuyên đi khám; (C) **Dừng gợi ý thuốc, kích hoạt `khuyen_di_kham` (cấp cứu 115) ngay lập tức và báo ưu tiên đỏ cho dược sĩ**.
+  * *Chọn:* Phương án (C).
+  * *Vì sao chọn:* Ca nghi ngờ nhồi máu cơ tim cần xử trí từng phút; chặn gợi ý thuốc ngăn việc che lấp triệu chứng nguy hiểm và không bắt khách nằm trong hàng chờ thông thường.
+  * *Loại (A) & (B) vì sao:* Loại (A) vì hỏi thêm làm mất thời gian vàng cấp cứu; loại (B) vì vi phạm trực tiếp nguyên tắc an toàn y tế (*"Dấu hiệu nguy hiểm: bảo đi khám, gọi cấp cứu ngay; không gợi ý thuốc"*).
+
+### 3.2. Kịch bản đắt #2: Trẻ nhỏ sốt cao + phụ huynh định dùng lại thuốc ho của người lớn
+* **AI nói gì (nguyên văn):**
+  > *"Tuyệt đối không dùng thuốc ho của bố cho bé vì hoạt chất và hàm lượng người lớn có thể gây quá liều nguy hiểm cho trẻ. Vì bé đang sốt cao 39°C và là trẻ nhỏ, mình chưa thể tự gợi ý thuốc mà đã chuyển ưu tiên cho Dược sĩ. Bạn chạm chọn nhanh độ tuổi của bé để Dược sĩ tính liều chuẩn nhé:"*
+* **Người dùng thấy gì:**
+  * Khung cảnh báo màu vàng cam: **`Tuyệt đối không dùng thuốc ho của bố cho bé`**.
+  * Nhãn giới hạn: **`Cần Dược sĩ xác nhận · Đối tượng nhạy cảm`**.
+  * Các nút chọn nhanh 1 chạm (Quick-reply chips): `[Dưới 6 tháng]` `[6 tháng – 2 tuổi]` `[2 – 6 tuổi]` `[Trên 6 tuổi]`.
+  * Thẻ trạng thái kết nối Dược sĩ có đếm ngược thời gian (`01:45`), hiển thị tóm tắt đã gửi sẵn và nút **`Hoàn tác chuyển / Hủy yêu cầu`**.
+* **Bước người dùng làm tiếp & Nếu không làm gì thì sao:**
+  * Phụ huynh chạm chọn độ tuổi bé để cập nhật thẳng vào phiếu tóm tắt của dược sĩ (hoặc bấm Hoàn tác nếu muốn hủy). Nếu phụ huynh không bấm gì trong 2 phút, cuộc chat vẫn tự động kết nối Dược sĩ kèm ghi chú *"Chưa rõ tuổi bé"*.
+* **Ai được báo, sau bao lâu:**
+  * **Dược sĩ trực online** được báo **ngay khi AI kích hoạt `chuyen_duoc_si` (0 giây)** kèm thẻ ưu tiên trẻ nhỏ và cảnh báo phụ huynh đang có ý định dùng thuốc người lớn.
+* **Quyết định phản ứng:**
+  * *Đã cân nhắc:* (A) Tự gọi `goi_y_san_pham` (thuốc hạ sốt trẻ em) để đáp ứng tâm lý *"đừng bắt mình chờ"* lúc nửa đêm; (B) Hỏi 5–6 câu sàng lọc đầy đủ rồi mới chuyển dược sĩ; (C) **Cảnh báo chặn dùng thuốc người lớn, hỏi gọn 1 chạm độ tuổi đồng thời kích hoạt `chuyen_duoc_si` ưu tiên**.
+  * *Chọn:* Phương án (C).
+  * *Vì sao chọn:* Giải quyết được sự nóng ruột của phụ huynh bằng cảnh báo tức thì và thao tác 1 chạm, nhưng vẫn giữ nguyên tắc không tự gợi ý thuốc/liều cho trẻ nhỏ.
+  * *Loại (A) & (B) vì sao:* Loại (A) vì thiếu tuổi/cân nặng của bé, tự gợi ý thuốc hạ sốt dễ gây ngộ độc gan do quá liều; loại (B) vì hỏi nhiều câu lúc nửa đêm khiến phụ huynh gắt gỏng hoặc bỏ chat đi tự cho bé uống thuốc của bố.
+
+### 3.3. Phân loại lỗi & Cách nói, cách sửa theo loại lỗi
+* **Kịch bản #1 là Lỗi ngữ cảnh (Context Error):** Hệ thống hiểu đúng ý định *"muốn mua thuốc giảm đau"* của khách, nhưng sai hoàn toàn với bối cảnh sinh tử thực tế (đau ngực + khó thở ở người 70 tuổi). *Cách nói & sửa:* Không xin lỗi chung chung mà chuyển sang cảnh báo hành động trực diện và ngắt toàn bộ giao diện mua sắm.
+* **Kịch bản #2 là Lỗi thiếu thông tin từ người dùng (User Input Ambiguity Error):** Người nhắn quên nêu tuổi, cân nặng của trẻ. *Cách nói & sửa:* Không đổ lỗi cho khách, giải thích ngắn lý do an toàn (*"tránh quá liều"*) và sửa bằng UI nút chọn nhanh 1 chạm kết hợp chuyển dược sĩ song song.
+
+### 3.4. Nguyên tắc HAX / PAIR áp dụng (trỏ vào chỗ cụ thể)
+1. **HAX G1 & G2 (Làm rõ năng lực & giới hạn hệ thống; tuân thủ Điều 11 khoản 1 Luật AI 134/2025/QH15):** Trỏ vào nhãn **`Trợ lý AI sàng lọc · Không thay thế chẩn đoán bác sĩ`** ở đầu khung chat (số `1` trên prototype) và nhãn trạng thái **`Cần Dược sĩ xác nhận · Đối tượng nhạy cảm`**.
+2. **HAX G10 (Thu hẹp phạm vi khi nghi ngờ):** Trỏ vào câu hỏi ở Kịch bản #2 (số `3` trên prototype) — thay vì đoán liều hạ sốt cho bé, AI thu hẹp phạm vi, chỉ đưa ra cảnh báo cấm dùng thuốc người lớn và hỏi đúng độ tuổi của bé.
+3. **PAIR Explainability + Trust & Errors + Graceful Failure:** Trỏ vào khung **`Dựa vào:`** (số `2` trên prototype) hiển thị căn cứ từ khóa kích hoạt cảnh báo, và nút chuyển **`Dược sĩ trực`** (số `5` trên prototype) kèm tóm tắt để khách không phải kể lại từ đầu.
+
+### 3.5. Lỗi sửa câu chữ không cứu được & Cách thiết kế cứu
+* **Lỗi sửa câu chữ không cứu được:** Ở Kịch bản #1, nếu giao diện vẫn hiển thị thẻ thuốc giảm đau kèm nút **`Thêm vào giỏ / Đặt ngay`**, thì dù câu chữ phía trên có khuyên *"bạn nên đi khám"* cẩn thận đến đâu, người nhà đang hoảng loạn vẫn có thể bấm nút mua thuốc cho bệnh nhân uống.
+* **Cách thiết kế cứu:** **Khóa cứng tầng công cụ và giao diện (Tool & UI Gating)** — khi phát hiện dấu hiệu nguy hiểm hoặc đối tượng nhạy cảm, hệ thống vô hiệu hóa hoàn toàn tool `goi_y_san_pham` và không render nút đặt mua trên màn hình (số `4` trên prototype), thay thế bằng nút gọi 115 hoặc chuyển dược sĩ.
 
 ---
