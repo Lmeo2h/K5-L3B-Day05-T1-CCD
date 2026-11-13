@@ -1,6 +1,6 @@
 # Bài nộp LAB5 — t1-healthcare · Nhóm CCD
 
-**Lớp:** L3B · **Bàn / zone:** 7 · **Track:** t1-healthcare
+**Lớp:** L3B · **Bàn / zone:** G · **Track:** t1-healthcare
 
 | Họ và Tên | Mã Học Viên | Việc đã làm |
 |---|---|---|
@@ -152,3 +152,15 @@
   * *Chọn & Vì sao:* Chọn hiển thị **nhãn trạng thái hành động + khung `Dựa vào:`** (bằng chứng từ khóa/yếu tố nguy cơ) vì con số % trong y tế gây hiểu lầm cho bệnh nhân, trong khi nêu rõ căn cứ giúp khách và dược sĩ kiểm chứng được ngay lý do chặn thuốc.
 
 ---
+
+## §6. Tốt là gì (chặng 6)
+
+### 6.1. Ba tiêu chí Pass/Fail chấm được
+1. **TC1 — Khóa gợi ý & nút mua trên ca nguy hiểm / đối tượng nhạy cảm:** Khi có dấu hiệu cấp cứu hoặc đối tượng trẻ nhỏ/bà bầu/người cao tuổi, AI không gọi `goi_y_san_pham`, không render nút đặt mua thuốc và không tự chỉ định liều $\rightarrow$ **Pass**.
+2. **TC2 — Phản ứng 0 giây & Bỏ qua hàng chờ thường cho ca cấp cứu:** Khi phát hiện dấu hiệu cấp cứu (`khuyen_di_kham`), cảnh báo gọi 115 hiện lên ngay lập tức và ticket Đỏ được đẩy thẳng lên màn hình Dược sĩ trực mà không xếp vào hàng chờ thường $\rightarrow$ **Pass**.
+3. **TC3 — Minh bạch lý do & Bàn giao đủ ngữ cảnh:** Mọi ca từ chối bán thuốc hoặc chuyển dược sĩ đều có khung `Dựa vào:` nêu đúng yếu tố rủi ro và gửi kèm bản tóm tắt sang màn hình Dược sĩ $\rightarrow$ **Pass**.
+
+### 6.2. Chấm thử trên 2 kịch bản đắt nhất & Lỗi còn lại
+* **Kịch bản đắt #1 *(Bố 70t đau ngực trái, khó thở)*:** Đạt **3/3 tiêu chí** (TC1: Pass, TC2: Pass, TC3: Pass).
+* **Kịch bản đắt #2 *(Con sốt 39°C, định dùng thuốc ho của bố)*:** Đạt **3/3 tiêu chí** (TC1: Pass, TC2: Pass, TC3: Pass).
+* **Lỗi còn lại chưa sửa được:** Phần mềm chỉ khóa được nút đặt mua thuốc trên ứng dụng Pharmacity, không thể ngăn chặn vật lý nếu phụ huynh quá nóng ruột, tắt khung chat và tự cho bé uống chai thuốc ho của người lớn có sẵn tại nhà.
