@@ -140,7 +140,7 @@
 
 * **File & Công cụ:** `prototype/index.html` (HTML5 / CSS3 / Vanilla JS thuần, mở trực tiếp trên trình duyệt không cần backend).
 * **Phần nào mock & Lời gọi AI thật:** Toàn bộ dữ liệu hội thoại, thẻ sản phẩm và phiếu bàn giao phía Dược sĩ được mock theo 3 kịch bản (2 ca đắt nhất + 1 ca bình thường); không sử dụng lời gọi AI thật.
-* **Ảnh chụp màn hình đánh số (`prototype/screen-1-cardiac.png` & `prototype/screen-2-child-pharma.png`):**
+* **Ảnh chụp màn hình đánh số (`prototype/screen-1-cardiac.png` & `prototype/screen-2-child-and-pharma.png`):**
   * **Số `1` (Nhãn định danh AI & Trạng thái giới hạn):** Thể hiện **HAX G1 & G2** (minh bạch hệ thống AI theo Luật AI 134/2025/QH15 và mức độ chắc chắn của ca tư vấn).
   * **Số `2` (Khung `Dựa vào:`):** Thể hiện **PAIR Explainability + Trust** — liệt kê rõ từ khóa triệu chứng hoặc 5 yếu tố sàng lọc làm căn cứ cho quyết định của AI.
   * **Số `3` (Câu hỏi sàng lọc 1 chạm ở ca trẻ nhỏ):** Thể hiện **HAX G10 (Thu hẹp phạm vi khi nghi ngờ)** — hỏi đúng độ tuổi bé thay vì đoán liều hạ sốt.

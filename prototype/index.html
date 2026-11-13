@@ -408,6 +408,7 @@
     <button class="tab-btn danger-tab active" data-sc="cardiac">🔥 Ca đắt #1: Bố 70t đau ngực, khó thở</button>
     <button class="tab-btn" data-sc="child">🔥 Ca đắt #2: Bé sốt 39°C (Demo bắt buộc)</button>
     <button class="tab-btn" data-sc="normal">✅ Ca bình thường: Người lớn đau họng</button>
+    <button class="tab-btn" data-sc="antibiotic" style="border-color:#7c3aed; color:#6d28d9;">⚡ Ca lạ (Hard Test): Đòi kháng sinh không đơn</button>
 
     <div class="view-switch">
       <button class="view-btn active" data-view="customer">📱 Màn hình Khách hàng</button>
@@ -462,7 +463,7 @@
 
 <script>
   const $ = (s) => document.querySelector(s);
-  let currentScenario = 'cardiac'; // 'cardiac' | 'child' | 'normal'
+  let currentScenario = 'cardiac'; // 'cardiac' | 'child' | 'normal' | 'antibiotic'
   let currentView = 'customer';    // 'customer' | 'pharmacist'
   let childAge = null;
   let stepState = 'init';          // 'init' | 'escalated' | 'ordered' | 'undone'
@@ -482,7 +483,7 @@
       level: 'Tự làm',
       cls: 'p-auto',
       reason: 'Chuyển thừa chỉ tốn 1–2 phút của dược sĩ; chuyển sót gây hại sức khỏe không đảo được.',
-      activeIn: ['cardiac', 'child']
+      activeIn: ['cardiac', 'child', 'antibiotic']
     },
     {
       name: 'goi_y_san_pham',
@@ -503,7 +504,7 @@
       level: 'Cấm',
       cls: 'p-ban',
       reason: 'Vi phạm pháp luật dược phẩm & nguy cơ kháng thuốc/sốc phản vệ không đảo được.',
-      activeIn: []
+      activeIn: ['antibiotic']
     }
   ];
 
@@ -570,6 +571,7 @@
 
     if (currentScenario === 'cardiac') renderCardiacCustomer(container);
     else if (currentScenario === 'child') renderChildCustomer(container);
+    else if (currentScenario === 'antibiotic') renderAntibioticCustomer(container);
     else renderNormalCustomer(container);
   }
 
@@ -713,6 +715,34 @@
     `;
   }
 
+  function renderAntibioticCustomer(el) {
+    $('#promise-text').innerHTML =
+      '<b>Ca lạ / Hard Test (Ngoài thẩm quyền & Luật Dược):</b> Khách đòi mua kháng sinh kê đơn không có đơn hoặc đòi thuốc thay thế. AI <b>từ chối dứt khoát</b>, vô hiệu hóa nút mua, viện dẫn quy định và <b>chuyển Dược sĩ</b> hướng dẫn tái khám.';
+
+    el.innerHTML = `
+      <div class="msg-user">Hôm trước bác sĩ kê Augmentin 1g mà nay hết rồi, bán cho mình 2 vỉ hoặc lấy loại nào tương tự uống cho khỏi hẳn</div>
+      <div class="msg-ai">
+        <div class="sender">Trợ lý AI Pharmacity</div>
+        <span class="status-pill st-danger"><span class="n">1</span>Từ chối thuốc kê đơn · Cấm bán tự động</span>
+        <div class="alert-card red">
+          <b>🚫 KHÔNG THỂ BÁN HOẶC ĐỔI THUỐC KÊ ĐƠN QUA CHAT:</b><br/>
+          Thuốc <b>Augmentin (Amoxicillin/Clavulanic acid)</b> là kháng sinh thuộc danh mục <b>THUỐC KÊ ĐƠN</b>.<br/><br/>
+          Theo Luật Dược và quy định an toàn Pharmacity, Trợ lý AI tuyệt đối <b>không được bán thuốc kê đơn không có đơn hợp lệ</b> và <b>không được tự gợi ý thuốc thay thế</b> vì nguy cơ sốc phản vệ và đề kháng kháng sinh nguy hiểm.
+        </div>
+        <div class="evidence-box">
+          <span class="n">2</span><b>Dựa vào:</b> Hoạt chất <i>Augmentin 1g</i> thuộc danh mục thuốc kê đơn · Khách không có đơn thuốc bác sĩ hợp lệ · Ràng buộc pháp luật & an toàn Track T1.
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-outline" onclick="alert('Đang mở chức năng tải ảnh đơn thuốc bác sĩ để Dược sĩ trực thẩm định...')">📷 Tải ảnh đơn thuốc bác sĩ lên để Dược sĩ kiểm tra</button>
+          <button class="btn btn-outline" onclick="switchToPharma()">
+            <span class="n">5</span>Nói chuyện Dược sĩ trực (Hướng dẫn tái khám)
+          </button>
+          <div class="btn btn-disabled"><span class="n">4</span>ĐÃ CẤM: Tool ban_thuoc_ke_don & Khóa gợi ý thuốc thay thế</div>
+        </div>
+      </div>
+    `;
+  }
+
   function renderPharmacistView(el) {
     $('#promise-text').innerHTML =
       '<b>Màn hình phía Dược sĩ (Bonus Track T1):</b> Giúp chứng minh câu hỏi R3 <i>"Ai được báo, sau bao lâu, người đó thấy gì?"</i>. Dược sĩ nhận phiếu tóm tắt có sẵn đối tượng, triệu chứng và hành động AI đã chặn.';
@@ -738,6 +768,17 @@
         <p style="margin:0 0 6px; font-size:13px;"><b>Triệu chứng:</b> Sốt 39°C, ho có đờm. Phụ huynh định cho uống thuốc ho của bố.</p>
         <p style="margin:0 0 8px; font-size:12.5px; color:var(--warn-amber);"><b>AI đã xử lý:</b> Cảnh báo cấm dùng thuốc người lớn + Khóa tự gợi ý OTC + Chuyển Dược sĩ tư vấn liều.</p>
         <button class="btn btn-blue" style="width:100%; padding:7px;" onclick="alert('Đã nhận ca #PMC-902 và mở bảng tính liều hạ sốt nhi khoa!')">Nhận tư vấn ca trẻ nhỏ</button>
+      </div>
+
+      <div class="ticket" style="border-left: 5px solid #7c3aed;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="status-pill" style="margin:0; background:#f5f3ff; color:#6d28d9; border:1px solid #ddd6fe;">⚖️ TỪ CHỐI THUỐC KÊ ĐƠN · 30s trước</span>
+          <small style="color:var(--muted);">Ca #PMC-903</small>
+        </div>
+        <h3 style="margin:8px 0 4px; font-size:14.5px;">Khách hàng: Hỏi mua Augmentin 1g (Kháng sinh) không đơn</h3>
+        <p style="margin:0 0 6px; font-size:13px;"><b>Yêu cầu:</b> Mua 2 vỉ hoặc đổi thuốc tương tự để uống tiếp.</p>
+        <p style="margin:0 0 8px; font-size:12.5px; color:#6d28d9;"><b>AI đã xử lý:</b> Cấm tool ban_thuoc_ke_don + Từ chối thuốc thay thế + Chuyển Dược sĩ hướng dẫn tái khám.</p>
+        <button class="btn btn-outline" style="width:100%; padding:7px; border-color:#7c3aed; color:#6d28d9;" onclick="alert('Tiếp nhận ca #PMC-903: Nhắc khách cần đơn bác sĩ hoặc hỗ trợ kết nối bác sĩ khám online!')">Tiếp nhận hỗ trợ quy định đơn thuốc</button>
       </div>
     `;
   }
