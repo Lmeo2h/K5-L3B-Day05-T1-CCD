@@ -104,3 +104,51 @@
 * **Cách thiết kế cứu:** **Khóa cứng tầng công cụ và giao diện (Tool & UI Gating)** — khi phát hiện dấu hiệu nguy hiểm hoặc đối tượng nhạy cảm, hệ thống vô hiệu hóa hoàn toàn tool `goi_y_san_pham` và không render nút đặt mua trên màn hình (số `4` trên prototype), thay thế bằng nút gọi 115 hoặc chuyển dược sĩ.
 
 ---
+
+## §4. Mức tự chủ (chặng 4)
+
+### 4.1. Bảng mức tự chủ cho toàn bộ 5 tool theo Cost-of-error
+
+| Tool | Mức của nhóm | Ai duyệt · Thấy gì · Quá hạn thì sao? | Lý do theo Cost-of-error *(Sai ai chịu · Đảo được không · Chờ mất gì)* | Phương án đã cân nhắc & Lý do loại |
+|---|---|---|---|---|
+| **`khuyen_di_kham`** | **Tự làm** | Không cần duyệt (kích hoạt ngay lập tức). | **Sai ai chịu:** Cảnh báo thừa thì khách chỉ tốn vài phút hoặc bấm bỏ qua. Chậm trễ chờ duyệt thì bệnh nhân có thể tử vong.<br>**Đảo lại:** Khách bỏ qua được.<br>**Chờ mất gì:** Mất thời gian vàng cấp cứu. | *Cân nhắc:* Cần dược sĩ duyệt trước khi hiện cảnh báo cấp cứu.<br>*Loại vì:* Giờ tối muộn dược sĩ phản hồi chậm 3–5 phút, chờ duyệt là vi phạm mục tiêu *"ca nguy hiểm không nằm trong hàng chờ"*. |
+| **`chuyen_duoc_si`** | **Tự làm** | Không cần duyệt (tự chuyển khi gặp đối tượng nhạy cảm / ngoài phạm vi). | **Sai ai chịu:** Chuyển thừa thì dược sĩ tốn 1–2 phút đọc tóm tắt. Chuyển sót thì khách mua sai thuốc gây hại sức khỏe.<br>**Đảo lại:** Được, tốn vài phút.<br>**Chờ mất gì:** Khách sốt ruột tắt chat tự mua thuốc bừa bãi. | *Cân nhắc:* Hỏi xin phép khách rồi mới bấm chuyển dược sĩ.<br>*Loại vì:* Với ca trẻ nhỏ/bà bầu, khách đang vội đòi thuốc; thêm bước hỏi xin phép làm chậm can thiệp chuyên môn. |
+| **`goi_y_san_pham`** | **Cần người duyệt** *(Tách 2 lớp)* | **Ai duyệt:** **Dược sĩ trực** duyệt với đối tượng nhạy cảm/bệnh nền/triệu chứng kéo dài. **Khách hàng** tự duyệt bấm đặt hàng nếu là người lớn khỏe mạnh đã qua đủ 5 bước sàng lọc OTC.<br>**Thấy gì:** 5 yếu tố sàng lọc + thông tin nhãn OTC.<br>**Quá hạn (>3 phút):** Giữ trạng thái chờ dược sĩ, gửi tin hướng dẫn chăm sóc vật lý, không tự bung gợi ý thuốc. | **Sai ai chịu:** Khách uống nhầm thuốc chịu tổn hại sức khỏe trực tiếp (dị ứng, tương tác thuốc, hại thai nhi/trẻ nhỏ).<br>**Đảo lại:** **Không đảo được** khi thuốc đã uống.<br>**Chờ mất gì:** Chờ dược sĩ 2–5 phút — chấp nhận được để đổi lấy an toàn tính mạng. | *Cân nhắc:* Cho AI **Tự làm** gợi ý OTC cho mọi khách hàng.<br>*Loại vì:* Khách thường quên khai người uống là trẻ nhỏ/người có bệnh nền (Kịch bản #1, #10), AI tự gợi ý sẽ gây hậu quả không đảo được. |
+| **`luu_ghi_chu_suc_khoe`** | **Cần người duyệt** *(Khách duyệt)* | **Ai duyệt:** **Khách hàng**.<br>**Thấy gì:** Thẻ xin phép rõ nội dung sẽ lưu + nút `[Đồng ý lưu]` / `[Không lưu]`.<br>**Quá hạn:** Mặc định **không lưu** (chỉ giữ tạm trong phiên chat). | **Sai ai chịu:** Khách bị lộ thông tin bệnh lý nhạy cảm hoặc AI lưu nhầm bệnh của người nhà vào hồ sơ của chính khách.<br>**Đảo lại:** Xóa được, nhưng rủi ro lộ thông tin và tư vấn nhầm lần sau đã xảy ra.<br>**Chờ mất gì:** Không mất gì. | *Cân nhắc:* **Tự làm** (tự động lưu mọi thông tin khách kể).<br>*Loại vì:* Vi phạm quy tắc đạo đức của track (*"Không lưu thông tin sức khoẻ khi khách chưa đồng ý"*). |
+| **`ban_thuoc_ke_don`** | **Cấm** | Vô hiệu hóa hoàn toàn khỏi luồng AI. | **Sai ai chịu:** Bệnh nhân chịu nguy cơ sốc phản vệ, kháng kháng sinh; nhà thuốc vi phạm pháp luật dược phẩm.<br>**Đảo lại:** **Không đảo được**. | *Cân nhắc:* **Cần dược sĩ duyệt** qua ảnh chụp đơn thuốc.<br>*Loại vì:* Rủi ro đơn giả/quá hạn qua chat cao; theo quy định track, AI tuyệt đối không tham gia bán thuốc kê đơn. |
+
+### 4.2. Tool khó xếp nhất & Cách nhóm chốt
+* **Tool khó xếp nhất:** **`goi_y_san_pham`**.
+* **Quan điểm từng thành viên & Cái giá mỗi phía:**
+  * *Thành viên 1 chọn **Tự làm** (trỏ Kịch bản #5 — đau họng nhẹ):* Nếu thuốc OTC thông thường cũng bắt dược sĩ duyệt thì khách phải chờ lâu lúc nửa đêm, AI mất tác dụng giảm tải.
+  * *Thành viên 2 chọn **Cần dược sĩ duyệt** (trỏ Kịch bản #1, #10 — trẻ nhỏ, mẹ tụt huyết áp):* Khách hay gài thông tin người bệnh nhạy cảm vào giữa câu; để AI tự gợi ý sẽ gây ngộ độc hoặc tương tác thuốc không đảo được.
+  * *Thành viên 3 chọn **Tự làm + Hoàn tác**:* Đề xuất AI tự gợi ý, sai thì hoàn tác đơn. Nhưng rủi ro y tế xảy ra khi khách **uống thuốc** chứ không phải lúc bấm đặt đơn, nên hoàn tác đơn không cứu được.
+* **Cách nhóm chốt:** Chốt ở mức **Cần người duyệt** kèm luật tách bước: khóa cứng chờ **Dược sĩ duyệt** nếu có bất kỳ dấu hiệu nguy hiểm/đối tượng nhạy cảm nào; chỉ mở cho **Khách hàng tự duyệt** đặt mua OTC khi đã xác nhận đủ 5 yếu tố an toàn.
+
+### 4.3. Thử mức tự chủ trên 3 kịch bản
+1. **Kịch bản đắt #1 *(Bố 70t đau ngực trái, khó thở)*:** AI tự động gọi `khuyen_di_kham` (cảnh báo 115) + báo động đỏ cho dược sĩ, khóa cứng `goi_y_san_pham`. $\rightarrow$ **Chặn được cái sai**, không hỏi rườm rà khi cần cấp cứu.
+2. **Kịch bản đắt #2 *(Con sốt 39°C, định dùng thuốc ho của bố)*:** AI cảnh báo cấm dùng thuốc người lớn, hỏi nhanh 1 chạm độ tuổi và tự động gọi `chuyen_duoc_si` ưu tiên, khóa `goi_y_san_pham`. $\rightarrow$ **Chặn được cái sai**, không tự đoán liều cho trẻ.
+3. **Kịch bản bình thường *(Khách 28t khỏe mạnh, không dị ứng/bệnh nền, đau rát họng nhẹ 1 ngày)*:** Sau khi xác nhận đủ 5 yếu tố an toàn, AI xuất thẻ gợi ý viên ngậm thảo dược OTC kèm thông tin nhãn để khách tự bấm thêm vào giỏ. $\rightarrow$ **Chặn được rủi ro dị ứng/quá liều**, và **người dùng bình thường không phải chờ vô ích** dược sĩ duyệt tay.
+
+### 4.4. Luật tách bước & Sự thay đổi lời hứa với người dùng
+* **Luật tách bước:** Tách quy trình gợi ý sản phẩm thành 2 bước bắt buộc: **(1) Sàng lọc 5 yếu tố an toàn** (tuổi, thai kỳ, dị ứng, bệnh nền, thời gian triệu chứng) và **(2) Xuất thẻ gợi ý OTC**. Thẻ gợi ý chỉ mở khóa khi bước (1) đạt trạng thái *"Người lớn khỏe mạnh — Không yếu tố nguy cơ"*.
+* **Lời hứa với người dùng thay đổi:** Chuyển từ lời hứa nguy hiểm *"AI tư vấn và chọn thuốc tự động cho mọi triệu chứng"* sang lời hứa minh bạch: **"AI sàng lọc nhanh trong 30 giây: gợi ý ngay sản phẩm OTC nếu bạn đủ điều kiện an toàn, hoặc kết nối ưu tiên Dược sĩ / Cảnh báo cấp cứu ngay lập tức khi có rủi ro."**
+
+---
+
+## §5. Prototype (chặng 5)
+
+* **File & Công cụ:** `prototype/index.html` (HTML5 / CSS3 / Vanilla JS thuần, mở trực tiếp trên trình duyệt không cần backend).
+* **Phần nào mock & Lời gọi AI thật:** Toàn bộ dữ liệu hội thoại, thẻ sản phẩm và phiếu bàn giao phía Dược sĩ được mock theo 3 kịch bản (2 ca đắt nhất + 1 ca bình thường); không sử dụng lời gọi AI thật.
+* **Ảnh chụp màn hình đánh số (`prototype/screen-1-cardiac.png` & `prototype/screen-2-child-pharma.png`):**
+  * **Số `1` (Nhãn định danh AI & Trạng thái giới hạn):** Thể hiện **HAX G1 & G2** (minh bạch hệ thống AI theo Luật AI 134/2025/QH15 và mức độ chắc chắn của ca tư vấn).
+  * **Số `2` (Khung `Dựa vào:`):** Thể hiện **PAIR Explainability + Trust** — liệt kê rõ từ khóa triệu chứng hoặc 5 yếu tố sàng lọc làm căn cứ cho quyết định của AI.
+  * **Số `3` (Câu hỏi sàng lọc 1 chạm ở ca trẻ nhỏ):** Thể hiện **HAX G10 (Thu hẹp phạm vi khi nghi ngờ)** — hỏi đúng độ tuổi bé thay vì đoán liều hạ sốt.
+  * **Số `4` (Thanh khóa cứng `Đã khóa tính năng gợi ý & đặt mua thuốc`):** Thể hiện cơ chế **Tool Gating** cho mức tự chủ **Cần dược sĩ duyệt / Cấm** ở ca nguy hiểm.
+  * **Số `5` (Nút chuyển Dược sĩ ưu tiên & Màn hình Dược sĩ nhận phiếu tóm tắt):** Thể hiện **PAIR Errors + Graceful Failure** và mức tự chủ **Tự làm** của `chuyen_duoc_si`.
+  * **Số `6` (Nút `Hoàn tác chuyển` / `Xóa khỏi giỏ` & Thẻ xin phép `Đồng ý lưu / Không lưu`):** Thể hiện **HAX G8 & G9 (Hoàn tác & Sửa dễ dàng)** và mức tự chủ **Khách hàng duyệt** của `luu_ghi_chu_suc_khoe`.
+* **Quyết định cách hiện độ chắc & điều khiển mức tự chủ:**
+  * *Đã cân nhắc:* Hiển thị con số phần trăm độ tin cậy (ví dụ *"Độ chắc chắn: 85%"*).
+  * *Chọn & Vì sao:* Chọn hiển thị **nhãn trạng thái hành động + khung `Dựa vào:`** (bằng chứng từ khóa/yếu tố nguy cơ) vì con số % trong y tế gây hiểu lầm cho bệnh nhân, trong khi nêu rõ căn cứ giúp khách và dược sĩ kiểm chứng được ngay lý do chặn thuốc.
+
+---
